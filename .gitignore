@@ -19,7 +19,7 @@ __pycache__/
 *.pyo
 
 # Trained Model Files
-# Keep trained models available for deployment
+# Keep the trained model tracked; it is required for local inference.
 
 # --- Dataset ---
 # Image datasets are very large (100+ MB).

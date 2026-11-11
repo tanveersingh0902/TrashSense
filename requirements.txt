@@ -9,7 +9,7 @@
 # Keras is built INTO TensorFlow, so installing TensorFlow gives us both.
 # We use it to build, train, and run our CNN model.
 # The trained trashsense_model.keras checkpoint was saved with TensorFlow/Keras 2.15.
-# Pin BOTH packages so Streamlit Cloud does not load it with Keras 3.
+# Keep both versions compatible with the saved model.
 tensorflow==2.15.0
 keras==2.15.0
 
