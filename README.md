@@ -1,4 +1,4 @@
-# TrashSense 2.0
+# TrashSense
 
 TrashSense is a local Streamlit application that uses image classification to
 suggest one of six waste categories: cardboard, glass, metal, paper, plastic,

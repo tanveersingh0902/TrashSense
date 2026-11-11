@@ -1,5 +1,5 @@
 # ============================================================
-# TRASHSENSE 2.0 - Required Python Libraries
+# TRASHSENSE - Required Python Libraries
 # ============================================================
 # Install all at once with: pip install -r requirements.txt
 # ============================================================

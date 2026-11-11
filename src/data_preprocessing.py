@@ -1,5 +1,5 @@
 # ============================================================
-# TRASHSENSE 2.0 - Data Preprocessing Pipeline
+# TRASHSENSE - Data Preprocessing Pipeline
 # ============================================================
 # FILE LOCATION: src/data_preprocessing.py
 #
@@ -606,7 +606,7 @@ def main():
     """
     print("\n")
     print("╔" + "═" * 58 + "╗")
-    print("║   TRASHSENSE 2.0 — STAGE 2: DATASET PREPARATION          ║")
+    print("║   TRASHSENSE — STAGE 2: DATASET PREPARATION               ║")
     print("╚" + "═" * 58 + "╝")
 
     # --- Determine where the dataset is ---

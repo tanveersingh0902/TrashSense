@@ -1,5 +1,5 @@
 # ============================================================
-# TRASHSENSE 2.0 - Project Configuration
+# TRASHSENSE - Project Configuration
 # ============================================================
 # PURPOSE: This file stores all the settings/constants used
 #          across the entire project in ONE place.

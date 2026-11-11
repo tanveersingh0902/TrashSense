@@ -1,5 +1,5 @@
 # ============================================================
-# TRASHSENSE 2.0 - Installation Verification Test
+# TRASHSENSE - Installation Verification Test
 # ============================================================
 # PURPOSE: Run this file AFTER installing requirements.txt
 #          to check if all libraries are installed correctly.
@@ -42,7 +42,7 @@ def main():
     Main function that checks all required libraries one by one.
     """
     print("=" * 60)
-    print("   TRASHSENSE 2.0 - Installation Verification")
+    print("   TRASHSENSE - Installation Verification")
     print("=" * 60)
     print()
 
@@ -84,7 +84,7 @@ def main():
     if failed == 0:
         print()
         print("  🎉 ALL LIBRARIES INSTALLED SUCCESSFULLY!")
-        print("  You are ready to build TrashSense 2.0!")
+        print("  You are ready to build TrashSense!")
     else:
         print()
         print("  ⚠️  Some libraries are missing.")

@@ -1,4 +1,4 @@
-"""Polished Streamlit interface for the TrashSense 2.0 classifier.
+"""Polished Streamlit interface for the TrashSense classifier.
 
 Run from the project root with:
     venv/Scripts/python.exe -m streamlit run app.py
@@ -481,7 +481,7 @@ def show_home_page():
         """
         <section class="hero-panel">
             <p class="eyebrow">Clearer sorting, one photo at a time</p>
-            <h1>Meet TrashSense 2.0</h1>
+            <h1>Meet TrashSense</h1>
             <p class="hero-copy">A simple AI-assisted tool for identifying everyday waste from an image and finding a sensible next step for disposal.</p>
         </section>
         """,
@@ -684,7 +684,7 @@ def show_history_page():
 def show_about_page():
     """Explain the project design, scope, and limitations."""
     st.markdown('<div class="section-kicker">Project overview</div>', unsafe_allow_html=True)
-    st.header("About TrashSense 2.0")
+    st.header("About TrashSense")
 
     about_sections = [
         (
@@ -725,7 +725,7 @@ def show_about_page():
 def main():
     """Configure the app, initialise session data, and show the selected page."""
     st.set_page_config(
-        page_title="TrashSense 2.0",
+        page_title="TrashSense",
         page_icon="♻️",
         layout="centered",
         initial_sidebar_state="expanded",

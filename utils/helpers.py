@@ -1,5 +1,5 @@
 # ============================================================
-# TRASHSENSE 2.0 - Helper Utility Functions
+# TRASHSENSE - Helper Utility Functions
 # ============================================================
 # FILE LOCATION: utils/helpers.py
 #
