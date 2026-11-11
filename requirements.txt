@@ -16,6 +16,7 @@ keras==2.15.0
 # --- Data Handling ---
 # NumPy: For working with arrays and numbers (images are stored as number arrays).
 numpy==1.26.4
+pyarrow==15.0.2
 
 # Pandas: For reading/writing CSV files and organizing data in tables.
 pandas==2.2.1
