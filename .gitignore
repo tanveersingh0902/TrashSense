@@ -25,7 +25,7 @@ __pycache__/
 # Image datasets are very large (100+ MB).
 # Other users should download the dataset separately.
 data/raw/
-data/processed/
+
 
 # --- OS Files ---
 # System files that your OS creates automatically.
