@@ -8,6 +8,9 @@ from datetime import datetime
 import os
 import tempfile
 
+# The deployed checkpoint was saved with Keras 2.15; load it through legacy Keras.
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
 import pandas as pd
 import streamlit as st
 from PIL import Image, UnidentifiedImageError
