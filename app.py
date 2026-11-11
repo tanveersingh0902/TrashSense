@@ -408,10 +408,53 @@ def apply_custom_style():
                 font-size: 1rem;
             }
             .about-card p { margin: 0; color: var(--muted); line-height: 1.6; }
+            .about-intro {
+                max-width: 850px;
+                margin: 0.35rem 0 1.4rem;
+                color: var(--muted);
+                font-size: 1.04rem;
+                line-height: 1.7;
+            }
+            .about-step-card, .about-category-card {
+                height: 100%;
+                padding: 1rem;
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                background: #FFFFFF;
+                box-shadow: 0 5px 16px rgba(22, 75, 50, 0.05);
+            }
+            .about-step-card { min-height: 142px; }
+            .about-step-number {
+                display: inline-block;
+                margin-bottom: 0.55rem;
+                color: var(--leaf);
+                font-size: 0.78rem;
+                font-weight: 750;
+                letter-spacing: 0.06em;
+            }
+            .about-step-card h3, .about-category-card h3 {
+                margin: 0 0 0.45rem;
+                color: var(--forest) !important;
+                font-size: 0.98rem;
+            }
+            .about-step-card p, .about-category-card p {
+                margin: 0;
+                color: var(--muted);
+                line-height: 1.55;
+            }
+            .about-category-card {
+                display: flex;
+                min-height: 86px;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            .about-category-card h3 { margin: 0; }
+            .about-category-icon { font-size: 1.5rem; }
             @media (max-width: 640px) {
                 .main .block-container { padding: 1.2rem 1rem 2.5rem; }
                 .hero-panel { border-radius: 16px; }
                 [data-testid="stMetric"] { margin-bottom: 0.45rem; }
+                .about-step-card, .about-category-card { padding: 0.9rem; }
             }
         </style>
         """,
@@ -767,6 +810,62 @@ def show_about_page():
     """Explain the project design, scope, and limitations."""
     st.markdown('<div class="section-kicker">Project overview</div>', unsafe_allow_html=True)
     st.header("About TrashSense")
+    st.markdown(
+        '<p class="about-intro">TrashSense is a student-built image-classification '
+        "prototype that helps people explore common waste categories and find "
+        'general disposal guidance from a photo.</p>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("### How TrashSense Works")
+    workflow_steps = [
+        (
+            "Image Upload",
+            "Choose a clear photo of one item in the Waste Detection section.",
+        ),
+        (
+            "Image Preprocessing",
+            "The image is converted to RGB, resized to 224 × 224 pixels, and prepared with MobileNetV2 preprocessing.",
+        ),
+        (
+            "MobileNetV2 Classification",
+            "A frozen, ImageNet-pretrained MobileNetV2 extracts image features for the waste classifier.",
+        ),
+        (
+            "Prediction and Confidence",
+            "The classifier returns six class scores; the highest score determines the displayed category and confidence.",
+        ),
+        (
+            "Smart Disposal Guidance",
+            "The predicted category links to general disposal suggestions. Check local rules before acting.",
+        ),
+    ]
+    for row_start in range(0, len(workflow_steps), 3):
+        row_steps = workflow_steps[row_start : row_start + 3]
+        step_columns = st.columns(len(row_steps), gap="small")
+        for column, (title, description), step_number in zip(
+            step_columns,
+            row_steps,
+            range(row_start + 1, row_start + len(row_steps) + 1),
+        ):
+            with column:
+                st.markdown(
+                    f'<div class="about-step-card">'
+                    f'<span class="about-step-number">STEP {step_number:02d}</span>'
+                    f'<h3>{title}</h3><p>{description}</p></div>',
+                    unsafe_allow_html=True,
+                )
+
+    st.markdown("### Supported Waste Categories")
+    category_columns = st.columns(3, gap="small")
+    for index, category in enumerate(config.WASTE_CATEGORIES):
+        with category_columns[index % len(category_columns)]:
+            st.markdown(
+                f'<div class="about-category-card">'
+                f'<span class="about-category-icon">{CATEGORY_ICONS[category]}</span>'
+                f'<h3>{category.capitalize()}</h3></div>',
+                unsafe_allow_html=True,
+            )
 
     about_sections = [
         (
@@ -779,7 +878,7 @@ def show_about_page():
         ),
         (
             "Model architecture",
-            "ImageNet-pretrained MobileNetV2 is used as a CNN feature extractor, followed by global average pooling, a 128-unit ReLU layer, 30% dropout, and a six-class Softmax output.",
+            "The model takes a 224 × 224 RGB image prepared with MobileNetV2 preprocessing. Its frozen, ImageNet-pretrained MobileNetV2 backbone has no original classification head; the custom head uses global average pooling, a 128-unit ReLU layer, 30% dropout, and a six-unit Softmax output.",
         ),
         (
             "Technology stack",
@@ -787,7 +886,7 @@ def show_about_page():
         ),
         (
             "Prototype limitations",
-            "A separate ImageNet classifier screens for some clearly unrelated objects, but it is not a guaranteed waste detector. Results still depend on image quality and training data, and cannot replace local recycling requirements.",
+            "Predictions depend on the training data and image quality. Non-waste detection is not guaranteed to reject every unrelated image. A confidence score does not guarantee that a prediction is correct. Disposal guidance is general; follow the rules provided by your local waste authority.",
         ),
         (
             "Future improvements",
