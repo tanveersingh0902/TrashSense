@@ -20,8 +20,8 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 import config
 
 
-# A prediction below 60% is displayed as uncertain, not as a reliable answer.
-DEFAULT_CONFIDENCE_THRESHOLD = 0.60
+# A prediction below the shared medium threshold is displayed as uncertain.
+DEFAULT_CONFIDENCE_THRESHOLD = config.MEDIUM_CONFIDENCE_THRESHOLD
 CLASS_MAPPING_PATH = os.path.join(config.PROCESSED_DATA_DIR, "class_mapping.csv")
 
 

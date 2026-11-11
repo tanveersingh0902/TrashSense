@@ -73,6 +73,13 @@ LEARNING_RATE = 0.0001
 VALIDATION_SPLIT = 0.2
 
 
+# --- Prediction Confidence Settings ---
+# These thresholds are used by predict.py and the Streamlit app.
+# A Softmax score is useful evidence, but it never guarantees the prediction is correct.
+MEDIUM_CONFIDENCE_THRESHOLD = 0.60
+HIGH_CONFIDENCE_THRESHOLD = 0.85
+
+
 # --- Waste Categories ---
 # These are the 6 types of waste our model will learn to classify.
 # The dataset should have one folder per category inside data/raw/.
