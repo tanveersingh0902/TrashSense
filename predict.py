@@ -26,30 +26,30 @@ CLASS_MAPPING_PATH = os.path.join(config.PROCESSED_DATA_DIR, "class_mapping.csv"
 
 
 def load_class_names():
-    """Read Stage 2's class-to-index mapping in its saved index order."""
+    """
+    Load class names from the CSV file if available.
+    Otherwise, use the categories defined in config.py.
+    """
+
     if not os.path.exists(CLASS_MAPPING_PATH):
-        raise FileNotFoundError(f"Class mapping file not found: {CLASS_MAPPING_PATH}")
+        print("Class mapping CSV not found. Using config.py categories.")
+        return config.WASTE_CATEGORIES
 
-    with open(CLASS_MAPPING_PATH, "r", encoding="utf-8", newline="") as mapping_file:
-        rows = list(csv.DictReader(mapping_file))
+    mapping_df = pd.read_csv(CLASS_MAPPING_PATH)
 
-    if not rows or set(rows[0]) != {"class_name", "class_index"}:
-        raise ValueError("class_mapping.csv must contain class_name and class_index columns.")
+    required_columns = {"class_name", "class_index"}
 
-    rows.sort(key=lambda row: int(row["class_index"]))
-    class_names = [row["class_name"] for row in rows]
-    class_indices = [int(row["class_index"]) for row in rows]
+    if not required_columns.issubset(mapping_df.columns):
+        raise ValueError("Invalid class_mapping.csv format.")
 
-    if class_indices != list(range(config.NUM_CLASSES)):
-        raise ValueError("class_mapping.csv must contain consecutive class indices from 0 to 5.")
+    mapping_df = mapping_df.sort_values("class_index")
+
+    class_names = mapping_df["class_name"].tolist()
+
     if class_names != config.WASTE_CATEGORIES:
-        raise ValueError(
-            "The saved class mapping does not match config.WASTE_CATEGORIES. "
-            f"Found: {class_names}"
-        )
+        raise ValueError("Class mapping does not match config.py.")
 
     return class_names
-
 
 def load_trained_model(class_names):
     """Load the saved Stage 4 checkpoint and check that it matches the dataset."""
