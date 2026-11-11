@@ -13,7 +13,13 @@ import streamlit as st
 from PIL import Image, UnidentifiedImageError
 
 import config
-from predict import load_class_names, load_trained_model, predict_image
+from predict import (
+    UnsupportedImageError,
+    load_class_names,
+    load_image_validation_model,
+    load_trained_model,
+    predict_image,
+)
 from utils.disposal_guidance import DISPOSAL_GUIDANCE
 
 
@@ -56,10 +62,11 @@ NAVIGATION_ICONS = {
 
 @st.cache_resource
 def get_prediction_resources():
-    """Load the Stage 2 mapping and Stage 4 model once per Streamlit server."""
+    """Load both inference models once per Streamlit server."""
     class_names = load_class_names()
     model = load_trained_model(class_names)
-    return model, class_names
+    image_validator = load_image_validation_model()
+    return model, class_names, image_validator
 
 
 def initialise_session_state():
@@ -81,7 +88,7 @@ def get_confidence_level(confidence):
     return "Low"
 
 
-def predict_uploaded_file(model, uploaded_file, class_names):
+def predict_uploaded_file(model, uploaded_file, class_names, image_validator):
     """Temporarily save an upload so the existing predict_image function can use it."""
     _, file_extension = os.path.splitext(uploaded_file.name)
     temporary_path = None
@@ -91,7 +98,7 @@ def predict_uploaded_file(model, uploaded_file, class_names):
             file.write(uploaded_file.getvalue())
             temporary_path = file.name
 
-        return predict_image(model, temporary_path, class_names)
+        return predict_image(model, temporary_path, class_names, image_validator)
     finally:
         # Remove the temporary upload whether prediction succeeds or raises an error.
         if temporary_path and os.path.exists(temporary_path):
@@ -558,16 +565,21 @@ def show_detection_page():
         disabled=uploaded_file is None,
         use_container_width=True,
     ):
+        st.session_state.latest_prediction_id = None
         try:
-            with st.spinner("Analysing the image with the trained model..."):
-                model, class_names = get_prediction_resources()
+            with st.spinner("Checking the image and analysing it..."):
+                model, class_names, image_validator = get_prediction_resources()
                 probabilities, predicted_label, confidence = predict_uploaded_file(
-                    model, uploaded_file, class_names
+                    model, uploaded_file, class_names, image_validator
                 )
             add_prediction_to_history(
                 predicted_label, confidence, probabilities, class_names
             )
+        except UnsupportedImageError as error:
+            st.warning(str(error))
         except (FileNotFoundError, ValueError, OSError) as error:
+            st.error(str(error))
+        except RuntimeError as error:
             st.error(str(error))
 
     latest_prediction = get_latest_prediction()
@@ -693,7 +705,7 @@ def show_about_page():
         ),
         (
             "Prototype limitations",
-            "Results depend on image quality and the training data. The model knows six categories only and cannot replace local recycling requirements or facility acceptance rules.",
+            "A separate ImageNet classifier screens for some clearly unrelated objects, but it is not a guaranteed waste detector. Results still depend on image quality and training data, and cannot replace local recycling requirements.",
         ),
         (
             "Future improvements",

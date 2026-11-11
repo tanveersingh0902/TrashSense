@@ -67,6 +67,25 @@ venv\Scripts\python.exe -m tests.test_model
 The first run may download MobileNetV2's pretrained ImageNet weights if they
 are not already cached.
 
+## Image screening at prediction time
+
+Before the six-class TrashSense model runs, the app uses a second, pretrained
+MobileNetV2 ImageNet classifier to screen for a set of clearly unrelated
+subjects (including common dog, cat, person, car, and landscape labels). The
+existing six-class checkpoint is not retrained or modified. If the screen
+recognizes one of those subjects with a strong score, the app asks for a waste
+photo and does not create a prediction-history entry.
+
+The ImageNet classifier uses the TensorFlow/Keras installation already
+required by this project. Its full top-classification weights are about 14 MB
+and may need to download the first time the app runs; an internet connection
+is needed for that first download unless the weights are already cached.
+Subsequent runs can use the cached weights offline. This conservative screen
+is not a universal waste/non-waste detector: it can miss unrelated images and
+may reject a waste photo if a recognizable non-waste subject dominates it.
+The six-class model's confidence remains a separate uncertainty indicator,
+not an out-of-distribution test.
+
 ## 🚀 Setup Instructions
 
 ```bash

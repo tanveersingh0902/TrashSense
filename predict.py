@@ -15,14 +15,19 @@ import os
 import numpy as np
 import tensorflow as tf
 from PIL import Image, UnidentifiedImageError
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from tensorflow.keras.applications.mobilenet_v2 import decode_predictions, preprocess_input
 
 import config
+from utils.image_validation import is_clearly_unrelated_image
 
 
 # A prediction below the shared medium threshold is displayed as uncertain.
 DEFAULT_CONFIDENCE_THRESHOLD = config.MEDIUM_CONFIDENCE_THRESHOLD
 CLASS_MAPPING_PATH = os.path.join(config.PROCESSED_DATA_DIR, "class_mapping.csv")
+
+
+class UnsupportedImageError(ValueError):
+    """Raised when the separate semantic check recognizes a non-waste subject."""
 
 
 def load_class_names():
@@ -75,6 +80,21 @@ def load_trained_model(class_names):
     return model
 
 
+def load_image_validation_model():
+    """Load the ImageNet classifier used to screen obvious non-waste images."""
+    try:
+        return tf.keras.applications.MobileNetV2(
+            input_shape=config.INPUT_SHAPE,
+            include_top=True,
+            weights="imagenet",
+        )
+    except (OSError, ValueError) as error:
+        raise RuntimeError(
+            "Could not load the ImageNet image-validation weights. Connect to the "
+            "internet for the first run, or ensure the weights are already cached."
+        ) from error
+
+
 def prepare_image(image_path):
     """Open one image and turn it into one MobileNetV2-ready image batch."""
     if not os.path.exists(image_path):
@@ -93,9 +113,21 @@ def prepare_image(image_path):
     return image_batch
 
 
-def predict_image(model, image_path, class_names):
-    """Return the six scores, highest-scoring class, and its confidence."""
+def predict_image(model, image_path, class_names, image_validator=None):
+    """Validate an image, then return its six waste scores and best class."""
     image_batch = prepare_image(image_path)
+
+    if image_validator is not None:
+        validation_scores = image_validator.predict(image_batch, verbose=0)
+        _, validation_label, validation_confidence = decode_predictions(
+            validation_scores, top=1
+        )[0][0]
+        if is_clearly_unrelated_image(validation_label, float(validation_confidence)):
+            raise UnsupportedImageError(
+                "This image looks like a non-waste subject. Please upload a clear "
+                "photo of cardboard, glass, metal, paper, plastic, or trash."
+            )
+
     probabilities = model.predict(image_batch, verbose=0)[0]
     predicted_index = int(np.argmax(probabilities))
     predicted_label = class_names[predicted_index]
@@ -123,10 +155,11 @@ def main():
     try:
         class_names = load_class_names()
         model = load_trained_model(class_names)
+        image_validator = load_image_validation_model()
         probabilities, predicted_label, confidence = predict_image(
-            model, arguments.image_path, class_names
+            model, arguments.image_path, class_names, image_validator
         )
-    except (FileNotFoundError, ValueError, OSError) as error:
+    except (FileNotFoundError, ValueError, OSError, RuntimeError) as error:
         parser.error(str(error))
 
     print("\nClass probabilities:")
