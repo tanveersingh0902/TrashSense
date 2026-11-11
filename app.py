@@ -1,4 +1,4 @@
-"""Polished Streamlit interface for the TrashSense classifier.
+""" Streamlit interface for the TrashSense classifier.
 
 Run from the project root with:
     venv/Scripts/python.exe -m streamlit run app.py

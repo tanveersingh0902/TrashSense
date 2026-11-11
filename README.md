@@ -156,6 +156,3 @@ Potential improvements include collecting more balanced and diverse labeled
 images, testing non-waste screening with a representative held-out dataset,
 calibrating confidence, and providing verified local disposal information.
 
-## Author
-
-Tanveer Singh — B.Tech Computer Science, 2nd Year

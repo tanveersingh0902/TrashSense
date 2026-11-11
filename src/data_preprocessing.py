@@ -1,6 +1,4 @@
-# ============================================================
 # TRASHSENSE - Data Preprocessing Pipeline
-# ============================================================
 # FILE LOCATION: src/data_preprocessing.py
 #
 # PURPOSE: This is the MAIN script for Stage 2.
@@ -17,7 +15,7 @@
 #   cd "c:\Users\tanveer singh\Desktop\TrashSense"
 #   venv\Scripts\activate
 #   python src/data_preprocessing.py
-# ============================================================
+
 
 import os
 import sys
@@ -72,9 +70,7 @@ from utils.helpers import (
 )
 
 
-# ============================================================
 # STEP 1: INSPECT THE RAW DATASET
-# ============================================================
 
 def inspect_dataset(dataset_path):
     """
@@ -153,9 +149,7 @@ def inspect_dataset(dataset_path):
     return class_counts
 
 
-# ============================================================
 # STEP 2: BUILD A FILE LIST WITH LABELS
-# ============================================================
 
 def build_file_list(dataset_path):
     """
@@ -218,9 +212,8 @@ def build_file_list(dataset_path):
     return file_df
 
 
-# ============================================================
 # STEP 3: SPLIT THE DATASET
-# ============================================================
+
 
 def split_dataset(file_df, train_ratio=0.70, val_ratio=0.15, test_ratio=0.15,
                   random_seed=42):
@@ -375,9 +368,7 @@ def save_split_info(train_df, val_df, test_df, output_dir):
     return train_path, val_path, test_path
 
 
-# ============================================================
 # STEP 5: CREATE DATA GENERATORS
-# ============================================================
 
 def create_data_generators(train_df, val_df, test_df):
     """
@@ -512,9 +503,7 @@ def create_data_generators(train_df, val_df, test_df):
     return train_generator, val_generator, test_generator
 
 
-# ============================================================
 # STEP 6: VISUALIZE AUGMENTED IMAGES
-# ============================================================
 
 def visualize_augmentation(train_df, save_path=None):
     """
@@ -596,9 +585,8 @@ def visualize_augmentation(train_df, save_path=None):
     plt.close(figure)
 
 
-# ============================================================
-# MAIN FUNCTION — ORCHESTRATES EVERYTHING
-# ============================================================
+# MAIN FUNCTION —
+
 
 def main():
     """

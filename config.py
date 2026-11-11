@@ -1,6 +1,5 @@
-# ============================================================
 # TRASHSENSE - Project Configuration
-# ============================================================
+
 # PURPOSE: This file stores all the settings/constants used
 #          across the entire project in ONE place.
 #
@@ -8,7 +7,7 @@
 #      we define them here ONCE. If we need to change a value,
 #      we change it in ONE place instead of hunting through
 #      every file.
-# ============================================================
+#
 
 import os
 

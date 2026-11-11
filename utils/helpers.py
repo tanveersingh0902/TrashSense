@@ -1,6 +1,5 @@
-# ============================================================
 # TRASHSENSE - Helper Utility Functions
-# ============================================================
+
 # FILE LOCATION: utils/helpers.py
 #
 # PURPOSE: Contains reusable helper functions used across
@@ -9,8 +8,8 @@
 # WHY SEPARATE FILE: Instead of writing plotting code in
 #          every script, we write it ONCE here and import it
 #          wherever needed. This follows the DRY principle
-#          (Don't Repeat Yourself).
-# ============================================================
+#          (Don't Repeat Yourself)
+
 
 import os
 import random

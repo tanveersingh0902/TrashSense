@@ -1,9 +1,3 @@
-"""Cautious, general disposal guidance shown by the Streamlit application.
-
-This is intentionally general. It does not replace city, campus, or waste
-facility rules, which can differ even between nearby locations.
-"""
-
 DISPOSAL_GUIDANCE = {
     "cardboard": {
         "general": "Cardboard may be accepted with paper recycling when it is clean and dry.",

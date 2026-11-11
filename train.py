@@ -1,8 +1,5 @@
 """Train the TrashSense MobileNetV2 waste-classification model.
 
-This script deliberately uses only the train and validation splits created in
-Stage 2.  The test split stays untouched until Stage 5.
-
 Run from the project root with:
     venv\Scripts\python.exe train.py
 """
@@ -25,7 +22,7 @@ import config
 from models.model import build_model
 
 
-# Files produced by Stage 2 and files produced by this training script.
+#files produced by this training script.
 TRAIN_CSV_PATH = os.path.join(config.PROCESSED_DATA_DIR, "train_split.csv")
 VALIDATION_CSV_PATH = os.path.join(config.PROCESSED_DATA_DIR, "val_split.csv")
 CLASS_MAPPING_PATH = os.path.join(config.PROCESSED_DATA_DIR, "class_mapping.csv")
@@ -74,8 +71,7 @@ def load_split_data():
     ]
     if not missing_train_images.empty or not missing_validation_images.empty:
         raise FileNotFoundError(
-            "Some image paths saved in Stage 2 no longer exist. "
-            "Re-run Stage 2 to recreate the split files."
+            "Some image files listed in the train/validation CSVs do not exist:\n"
         )
 
     return train_df, validation_df
@@ -95,8 +91,7 @@ def create_training_generators(train_df, validation_df):
     )
     validation_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
 
-    # Stage 2 used class_mode="categorical", so each label is one-hot encoded.
-    # The explicit class order preserves Stage 2's mapping: cardboard=0 ... trash=5.
+    
     class_names = config.WASTE_CATEGORIES
     train_generator = train_datagen.flow_from_dataframe(
         dataframe=train_df,

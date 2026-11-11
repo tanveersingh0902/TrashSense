@@ -1,11 +1,10 @@
-# ============================================================
 # TRASHSENSE - Installation Verification Test
-# ============================================================
+
 # PURPOSE: Run this file AFTER installing requirements.txt
 #          to check if all libraries are installed correctly.
 #
 # HOW TO RUN: python tests/test_installation.py
-# ============================================================
+
 
 def check_library(library_name, import_name=None):
     """

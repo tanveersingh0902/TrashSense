@@ -1,8 +1,4 @@
-"""Evaluate the trained TrashSense model on Stage 2's untouched test split.
-
-This script never calls model.fit(), so it never trains or changes the saved
-model weights.  It uses only data/processed/test_split.csv, which Stage 2
-reserved for this final evaluation.
+"""Evaluate the trained TrashSense model 
 
 Run from the project root with:
     venv\Scripts\python.exe evaluate.py
