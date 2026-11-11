@@ -12,7 +12,6 @@
 # Pin BOTH packages so Streamlit Cloud does not load it with Keras 3.
 tensorflow==2.15.0
 keras==2.15.0
-tf-keras==2.15.1
 
 # --- Data Handling ---
 # NumPy: For working with arrays and numbers (images are stored as number arrays).

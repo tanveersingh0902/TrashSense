@@ -12,9 +12,6 @@ import argparse
 import csv
 import os
 
-# Match the Keras version used to save the deployed model checkpoint.
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
-
 import numpy as np
 import tensorflow as tf
 from PIL import Image, UnidentifiedImageError
