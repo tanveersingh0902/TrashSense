@@ -8,6 +8,11 @@ from datetime import datetime
 import os
 import tempfile
 
+# --- Force Keras 2 on Streamlit Cloud before any TensorFlow import ---
+# The model was saved with Keras 2.15. If Keras 3 is installed, loading
+# fails with "Layer 'Conv1' expected 1 variables, but received 0".
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
 import pandas as pd
 import streamlit as st
 from PIL import Image, UnidentifiedImageError

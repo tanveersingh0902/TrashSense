@@ -12,6 +12,13 @@ import argparse
 import csv
 import os
 
+# --- Force Keras 2 backend before importing TensorFlow ---
+# On Streamlit Cloud, if Keras 3 gets installed alongside TensorFlow 2.15,
+# this environment variable forces TensorFlow to use its bundled Keras 2
+# instead of the standalone Keras 3 package. Without this, model loading
+# fails with: "Layer 'Conv1' expected 1 variables, but received 0"
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
 import numpy as np
 import tensorflow as tf
 from PIL import Image, UnidentifiedImageError

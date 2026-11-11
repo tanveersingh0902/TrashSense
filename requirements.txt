@@ -13,6 +13,11 @@
 tensorflow==2.15.0
 keras==2.15.0
 
+# --- CRITICAL: Pin tf-keras to prevent Keras 3 auto-upgrade ---
+# Streamlit Cloud may resolve a newer Keras 3.x which breaks model loading.
+# tf-keras ensures the legacy Keras 2 API is available.
+tf-keras==2.15.1
+
 # --- Data Handling ---
 # NumPy: For working with arrays and numbers (images are stored as number arrays).
 numpy==1.26.4
