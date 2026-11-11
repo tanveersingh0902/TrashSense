@@ -18,12 +18,8 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# --- Trained Model Files ---
-# Model files are very large (50-100+ MB).
-# They should not be uploaded to GitHub.
-*.h5
-*.keras
-models/saved_models/
+# Trained Model Files
+# Keep trained models available for deployment
 
 # --- Dataset ---
 # Image datasets are very large (100+ MB).
