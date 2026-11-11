@@ -1,0 +1,41 @@
+# ============================================================
+# TRASHSENSE 2.0 - Required Python Libraries
+# ============================================================
+# Install all at once with: pip install -r requirements.txt
+# ============================================================
+
+# --- Deep Learning Framework ---
+# TensorFlow: The main AI/ML library that contains Keras.
+# Keras is built INTO TensorFlow, so installing TensorFlow gives us both.
+# We use it to build, train, and run our CNN model.
+tensorflow==2.15.0
+
+# --- Data Handling ---
+# NumPy: For working with arrays and numbers (images are stored as number arrays).
+numpy==1.26.4
+
+# Pandas: For reading/writing CSV files and organizing data in tables.
+pandas==2.2.1
+
+# --- Image Processing ---
+# Pillow (PIL): For opening, resizing, and manipulating images.
+Pillow==10.2.0
+
+# --- Machine Learning Utilities ---
+# Scikit-learn: For splitting data into train/test sets, confusion matrix, accuracy reports.
+scikit-learn==1.4.1.post1
+
+# --- Visualization ---
+# Matplotlib: For creating charts and graphs (accuracy plots, loss curves, etc.).
+matplotlib==3.8.3
+
+# Seaborn: Makes prettier charts than plain matplotlib (used for confusion matrix heatmaps).
+seaborn==0.13.2
+
+# --- Web Application ---
+# Streamlit: For building the web interface where users upload images to classify.
+streamlit==1.31.1
+
+# --- Utility ---
+# tqdm: Shows progress bars during training (so you know how long training will take).
+tqdm==4.66.2
