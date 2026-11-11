@@ -77,6 +77,8 @@ def initialise_session_state():
         st.session_state.latest_prediction_id = None
     if "page_navigation" not in st.session_state:
         st.session_state.page_navigation = "Home"
+    if "selected_guidance_category" not in st.session_state:
+        st.session_state.selected_guidance_category = None
 
 
 def get_confidence_level(confidence):
@@ -193,6 +195,14 @@ def apply_custom_style():
                 background: #FFFFFF;
                 border-right: 1px solid var(--line);
             }
+            [data-testid="stSidebarUserContent"] {
+                padding-top: 1rem;
+            }
+            [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {
+                margin-top: 0 !important;
+                margin-bottom: 0.4rem !important;
+                font-size: 1.6rem !important;
+            }
             [data-testid="stSidebar"] .stRadio label {
                 border-radius: 9px;
                 margin: 0.2rem 0;
@@ -230,6 +240,15 @@ def apply_custom_style():
                 border-color: #164B32;
                 color: #ffffff;
                 transform: translateY(-1px);
+            }
+            .stButton > button:focus-visible,
+            .stDownloadButton > button:focus-visible {
+                outline: 3px solid var(--leaf);
+                outline-offset: 3px;
+            }
+            .stButton > button:active,
+            .stDownloadButton > button:active {
+                transform: scale(0.98);
             }
             .stButton > button:disabled {
                 background: #E6F4EB;
@@ -312,12 +331,6 @@ def apply_custom_style():
                 letter-spacing: 0.07em;
                 text-transform: uppercase;
             }
-            .category-grid {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 0.8rem;
-                margin: 1rem 0 1.3rem;
-            }
             .category-card {
                 min-height: 96px;
                 padding: 1rem;
@@ -397,7 +410,6 @@ def apply_custom_style():
             .about-card p { margin: 0; color: var(--muted); line-height: 1.6; }
             @media (max-width: 640px) {
                 .main .block-container { padding: 1.2rem 1rem 2.5rem; }
-                .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
                 .hero-panel { border-radius: 16px; }
                 [data-testid="stMetric"] { margin-bottom: 0.45rem; }
             }
@@ -475,6 +487,12 @@ def navigate_to_detection():
     st.session_state.page_navigation = "Waste Detection"
 
 
+def navigate_to_guidance(class_name):
+    """Open disposal guidance for a category selected from the home page."""
+    st.session_state.selected_guidance_category = class_name
+    st.session_state.page_navigation = "Smart Disposal Assistant"
+
+
 def show_home_page():
     """Show a concise introduction and the six supported classes."""
     st.markdown(
@@ -490,15 +508,24 @@ def show_home_page():
 
     st.markdown('<div class="section-kicker">What it recognises</div>', unsafe_allow_html=True)
     st.markdown("## Six everyday waste categories")
-    category_cards = "".join(
-        f'''<div class="category-card">
-            <span class="category-icon">{CATEGORY_ICONS[class_name]}</span>
-            <span class="category-name">{class_name.capitalize()}</span>
-            <span class="category-caption">{CATEGORY_DESCRIPTIONS[class_name]}</span>
-        </div>'''
-        for class_name in config.WASTE_CATEGORIES
-    )
-    st.markdown(f'<div class="category-grid">{category_cards}</div>', unsafe_allow_html=True)
+    category_columns = st.columns(3, gap="small")
+    for index, class_name in enumerate(config.WASTE_CATEGORIES):
+        with category_columns[index % len(category_columns)]:
+            st.markdown(
+                f'''<div class="category-card">
+                    <span class="category-icon">{CATEGORY_ICONS[class_name]}</span>
+                    <span class="category-name">{class_name.capitalize()}</span>
+                    <span class="category-caption">{CATEGORY_DESCRIPTIONS[class_name]}</span>
+                </div>''',
+                unsafe_allow_html=True,
+            )
+            st.button(
+                "Explore disposal guidance",
+                key=f"guidance_{class_name}",
+                use_container_width=True,
+                on_click=navigate_to_guidance,
+                args=(class_name,),
+            )
 
     st.markdown(
         '<div class="info-card"><strong>Ready when you are.</strong><br>'
@@ -540,6 +567,7 @@ def show_detection_page():
         help="For the best result, use a well-lit image with one main item.",
     )
 
+    image_is_valid = False
     if uploaded_file is not None:
         try:
             with Image.open(uploaded_file) as preview_image:
@@ -547,6 +575,7 @@ def show_detection_page():
                 image_format = preview_image.format or "Unknown"
                 image_width, image_height = preview_image.size
 
+            image_is_valid = True
             preview_column, details_column = st.columns([3, 2], gap="large")
             with preview_column:
                 st.image(preview_copy, caption="Image preview", use_column_width=True)
@@ -556,25 +585,28 @@ def show_detection_page():
                 st.metric("Format", image_format.upper())
                 st.metric("File size", f"{uploaded_file.size / 1024:.1f} KB")
                 st.caption("For a more reliable estimate, avoid cluttered or very dark photos.")
+            st.caption("Image ready. Analyse it when you are ready.")
         except (UnidentifiedImageError, OSError):
             st.error("This file could not be opened as a valid image.")
 
     if st.button(
         "Analyse waste image",
         type="primary",
-        disabled=uploaded_file is None,
+        disabled=uploaded_file is None or not image_is_valid,
         use_container_width=True,
     ):
         st.session_state.latest_prediction_id = None
         try:
-            with st.spinner("Checking the image and analysing it..."):
+            with st.spinner("Loading the trained model and image checker. First use may take longer..."):
                 model, class_names, image_validator = get_prediction_resources()
+            with st.spinner("Preparing the image and generating its prediction..."):
                 probabilities, predicted_label, confidence = predict_uploaded_file(
                     model, uploaded_file, class_names, image_validator
                 )
             add_prediction_to_history(
                 predicted_label, confidence, probabilities, class_names
             )
+            st.success("Analysis complete. This prediction is saved in the current session.")
         except UnsupportedImageError as error:
             st.warning(str(error))
         except (FileNotFoundError, ValueError, OSError) as error:
@@ -597,9 +629,13 @@ def show_guidance_page():
         "Rules differ by city, country, facility, and item condition. A category prediction does not prove that an item is recyclable. Follow your local waste-management authority's instructions."
     )
 
+    selected_category = st.session_state.selected_guidance_category
     for class_name in config.WASTE_CATEGORIES:
         guidance = DISPOSAL_GUIDANCE[class_name]
-        with st.expander(f"{CATEGORY_ICONS[class_name]}  {class_name.capitalize()} disposal guidance"):
+        with st.expander(
+            f"{CATEGORY_ICONS[class_name]}  {class_name.capitalize()} disposal guidance",
+            expanded=class_name == selected_category,
+        ):
             st.markdown(
                 f'''<span class="guidance-label">General suggestion</span>{guidance["general"]}
                 <br><br><span class="guidance-label">Before you dispose of it</span>{guidance["prepare"]}
@@ -620,23 +656,43 @@ def show_dashboard_page():
         return
 
     category_order = [class_name.capitalize() for class_name in config.WASTE_CATEGORIES]
+    selected_category = st.selectbox(
+        "Filter by category",
+        ["All categories"] + category_order,
+        key="dashboard_category_filter",
+    )
+    filtered_history = history_df
+    if selected_category != "All categories":
+        filtered_history = history_df[
+            history_df["Predicted category"] == selected_category
+        ]
+    if filtered_history.empty:
+        st.info(f"No {selected_category.lower()} predictions in this session yet.")
+        return
+
     category_counts = (
-        history_df["Predicted category"].value_counts().reindex(category_order, fill_value=0)
+        filtered_history["Predicted category"]
+        .value_counts()
+        .reindex(category_order, fill_value=0)
     )
     most_frequent_count = int(category_counts.max())
     most_frequent_categories = category_counts[
         category_counts == most_frequent_count
     ].index.tolist()
     most_frequent_label = ", ".join(most_frequent_categories)
-    average_confidence = history_df["Confidence (%)"].mean()
 
     total_column, frequent_column, confidence_column = st.columns(3)
-    total_column.metric("Total predictions", len(history_df))
+    total_column.metric("Total predictions", len(filtered_history))
     frequent_column.metric("Most detected", f"{most_frequent_label} ({most_frequent_count})")
-    confidence_column.metric("Average confidence", f"{average_confidence:.1f}%")
+    confidence_column.metric(
+        "Average confidence", f"{filtered_history['Confidence (%)'].mean():.1f}%"
+    )
 
     st.markdown("#### Predictions by category")
-    st.caption("Counts are calculated from real predictions made in this browser session.")
+    st.caption(
+        f"Showing {len(filtered_history)} of {len(history_df)} real predictions "
+        "from this browser session."
+    )
     st.bar_chart(
         category_counts.to_frame(name="Predictions"),
         color="#2f8657",
@@ -645,7 +701,7 @@ def show_dashboard_page():
 
     st.markdown("#### Recent predictions")
     st.dataframe(
-        history_df.iloc[::-1].head(10),
+        filtered_history.iloc[::-1].head(10),
         use_container_width=True,
         hide_index=True,
     )
@@ -662,9 +718,35 @@ def show_history_page():
         return
 
     st.caption("This history is stored only for the current browser session.")
-    st.dataframe(history_df.iloc[::-1], use_container_width=True, hide_index=True)
+    category_order = [class_name.capitalize() for class_name in config.WASTE_CATEGORIES]
+    selected_category = st.selectbox(
+        "Filter by category",
+        ["All categories"] + category_order,
+        key="history_category_filter",
+    )
+    sort_order = st.radio(
+        "Order",
+        ["Newest first", "Oldest first"],
+        horizontal=True,
+        key="history_sort_order",
+    )
+    filtered_history = history_df
+    if selected_category != "All categories":
+        filtered_history = history_df[
+            history_df["Predicted category"] == selected_category
+        ]
+
+    ordered_history = (
+        filtered_history.iloc[::-1]
+        if sort_order == "Newest first"
+        else filtered_history
+    )
+    st.dataframe(ordered_history, use_container_width=True, hide_index=True)
+    if filtered_history.empty:
+        st.info(f"No {selected_category.lower()} predictions in this session yet.")
 
     csv_data = history_df.to_csv(index=False).encode("utf-8")
+    st.caption("The CSV download includes the full session history, regardless of filters.")
     download_column, clear_column = st.columns(2)
     with download_column:
         st.download_button(
